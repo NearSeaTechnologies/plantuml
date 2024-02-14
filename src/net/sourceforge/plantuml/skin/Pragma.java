@@ -90,6 +90,14 @@ public class Pragma {
 		return isTrue(getValue("kermor"));
 	}
 
+	public boolean forceLabel() {
+		return isTrue(getValue("forcelabel"));
+	}
+
+	public boolean sideLabelSpace() {
+		return isTrue(getValue("sidelabelspace"));
+	}
+
 	public boolean useIntermediatePackages() {
 		return !isFalse(getValue("useintermediatepackages"));
 	}

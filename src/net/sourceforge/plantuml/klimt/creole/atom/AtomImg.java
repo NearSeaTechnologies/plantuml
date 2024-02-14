@@ -67,6 +67,8 @@ import net.sourceforge.plantuml.utils.Base64Coder;
 public class AtomImg extends AbstractAtom implements Atom {
 
 	public static final String DATA_IMAGE_PNG_BASE64 = "data:image/png;base64,";
+	public static final String DATA_IMAGE_JPG_BASE64 = "data:image/jpg;base64,";
+	public static final String DATA_IMAGE_JPEG_BASE64 = "data:image/jpeg;base64,";
 	private static final String DATA_IMAGE_SVG_BASE64 = "data:image/svg+xml;base64,";
 	private final BufferedImage image;
 	private final double scale;
@@ -99,6 +101,26 @@ public class AtomImg extends AbstractAtom implements Atom {
 
 		if (src.startsWith(DATA_IMAGE_PNG_BASE64)) {
 			final String data = src.substring(DATA_IMAGE_PNG_BASE64.length(), src.length());
+			try {
+				final byte bytes[] = Base64Coder.decode(data);
+				return buildRasterFromData(src, fc, bytes, scale, url);
+			} catch (Exception e) {
+				return AtomTextUtils.createLegacy("ERROR " + e.toString(), fc);
+			}
+		}
+
+		if (src.startsWith(DATA_IMAGE_JPG_BASE64)) {
+			final String data = src.substring(DATA_IMAGE_JPG_BASE64.length(), src.length());
+			try {
+				final byte bytes[] = Base64Coder.decode(data);
+				return buildRasterFromData(src, fc, bytes, scale, url);
+			} catch (Exception e) {
+				return AtomTextUtils.createLegacy("ERROR " + e.toString(), fc);
+			}
+		}
+
+		if (src.startsWith(DATA_IMAGE_JPEG_BASE64)) {
+			final String data = src.substring(DATA_IMAGE_JPEG_BASE64.length(), src.length());
 			try {
 				final byte bytes[] = Base64Coder.decode(data);
 				return buildRasterFromData(src, fc, bytes, scale, url);

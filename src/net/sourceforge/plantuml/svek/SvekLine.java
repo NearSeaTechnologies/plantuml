@@ -405,10 +405,29 @@ public class SvekLine implements Moveable, Hideable, GuideLine {
 			sb.append(",");
 		}
 		sb.append("color=\"" + StringUtils.sharp000000(lineColor) + "\"");
-		if (hasNoteLabelText() || link.getLinkConstraint() != null) {
+
+		XDimension2D headLabelDim = new XDimension2D(0,0);
+		XDimension2D tailLabelDim = new XDimension2D(0,0);
+
+		if (startTailText != null) {
 			sb.append(",");
-			if (graphvizVersion.useXLabelInsteadOfLabel() || dotMode == DotMode.NO_LEFT_RIGHT_AND_XLABEL
-					|| dotSplines == DotSplines.ORTHO) {
+			sb.append("taillabel=<");
+			tailLabelDim = startTailText.calculateDimension(stringBounder);
+			appendTable(sb, tailLabelDim, startTailColor, graphvizVersion);
+			sb.append(">");
+		}
+		if (endHeadText != null) {
+			sb.append(",");
+			sb.append("headlabel=<");
+			headLabelDim = endHeadText.calculateDimension(stringBounder);
+			appendTable(sb, headLabelDim, endHeadColor, graphvizVersion);
+			sb.append(">");
+		}
+
+		if (hasNoteLabelText() || link.getLinkConstraint() != null || pragma.sideLabelSpace()) {
+			sb.append(",");
+			if ((graphvizVersion.useXLabelInsteadOfLabel() || dotMode == DotMode.NO_LEFT_RIGHT_AND_XLABEL
+					|| dotSplines == DotSplines.ORTHO) && !pragma.forceLabel()) {
 				sb.append("xlabel=<");
 			} else {
 				sb.append("label=<");
@@ -416,20 +435,12 @@ public class SvekLine implements Moveable, Hideable, GuideLine {
 			XDimension2D dimNote = hasNoteLabelText() ? labelText.calculateDimension(stringBounder) : CONSTRAINT_SPOT;
 			dimNote = dimNote.delta(2 * labelShield);
 
-			appendTable(sb, eventuallyDivideByTwo(dimNote), noteLabelColor, graphvizVersion);
-			sb.append(">");
-		}
+			if (pragma.sideLabelSpace()) {
+				dimNote = dimNote.delta(headLabelDim.getWidth(), headLabelDim.getHeight());
+				dimNote = dimNote.delta(tailLabelDim.getWidth(), tailLabelDim.getHeight());
+			}
 
-		if (startTailText != null) {
-			sb.append(",");
-			sb.append("taillabel=<");
-			appendTable(sb, startTailText.calculateDimension(stringBounder), startTailColor, graphvizVersion);
-			sb.append(">");
-		}
-		if (endHeadText != null) {
-			sb.append(",");
-			sb.append("headlabel=<");
-			appendTable(sb, endHeadText.calculateDimension(stringBounder), endHeadColor, graphvizVersion);
+			appendTable(sb, eventuallyDivideByTwo(dimNote), noteLabelColor, graphvizVersion);
 			sb.append(">");
 		}
 
